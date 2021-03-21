@@ -1,26 +1,18 @@
-import javassist.CodeConverter;
+
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
-import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.objects.CallbackQuery;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
-import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 
-import javax.xml.crypto.Data;
-import java.lang.invoke.SwitchPoint;
-import java.time.MonthDay;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class Bot extends TelegramLongPollingBot {
@@ -33,43 +25,140 @@ public class Bot extends TelegramLongPollingBot {
         } catch (TelegramApiRequestException e) {
             e.printStackTrace();
         }
+
     }
 
     Calendar c = Calendar.getInstance();
     Integer dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
     Integer nextDayOfWeek = dayOfWeek - 1;
+    Person Person = new Person();
 
     @Override
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
+
         if (update.getMessage() != null && update.getMessage().hasText()) {
             switch (update.getMessage().getText()) {
-                case "Расписание на завтра": {
-                    SendMsg(message, "Кому требуеться рассписание");
-                    switch (update.getMessage().getText()) {
-                        case "Пупсик": {
-                            switch (dayOfWeek) {
-                                case 7: {
-                                    SendMsg(message, "2");
-                                    break;
-                                }
-                                default:
-                                    SendMsg(message, "3");
-                            }
-                            break;
-                        }
-                    }
-
+                case "Пупсик": {
+                    Person.SetPerson("Пупсик");
+                    SendMsg(message, "Вы написали Пупсик");
                     break;
                 }
-                case "Расписание на сегодня": {
-                    SendMsg(message, "4");
+                case "Папочка": {
+                    Person.SetPerson("Папочка");
+                    SendMsg(message, "Вы написали Папочка");
+                    break;
+                }
+                case "Дэн": {
+                    Person.SetPerson("Дэн");
+                    SendMsg(message, "Вы написали Дэн");
                     break;
                 }
             }
 
+
         }
-    }
+        if (update.getMessage() != null && update.getMessage().hasText() && Person.GetPesrson() != null) {
+            switch (Person.GetPesrson()) {
+                case "Дэн": {
+                    switch (update.getMessage().getText()) {
+                        case "Расписание на завтра": {
+                            switch (dayOfWeek) {
+                                case 1: {SendMsg(message,"-----\n");SendMsg(message,"Лекция Захаров\n");break;}
+                                case 2: {SendMsg(message,"-----\n");SendMsg(message,"Лекция Рожкова\n");SendMsg(message,"Химия лекция\n");break;}
+                                case 3:{SendMsg(message,"Выходные\n");break;}
+                                case 4:{SendMsg(message,"Упражнение захаров\n");SendMsg(message,"Упр Рожкова\n");SendMsg(message,"Химия\n");break;}
+                                case 5:{SendMsg(message,"-----\n");SendMsg(message,"------\n");SendMsg(message,"Ин.яз\n");break;}
+                                case 6:{SendMsg(message,"Выходные");break;}
+                                case 7:{SendMsg(message,"Выходные");break;}
+                            }
+                            break;
+                        }
+                        case "Расписание на сегодня": {
+                            switch (nextDayOfWeek) {
+                                case 1: {SendMsg(message,"-----\n");SendMsg(message,"Лекция Захаров\n");break;}
+                                case 2: {SendMsg(message,"-----\n");SendMsg(message,"Лекция Рожкова\n");SendMsg(message,"Химия лекция\n");break;}
+                                case 3:{SendMsg(message,"Выходные\n");break;}
+                                case 4:{SendMsg(message,"Упражнение захаров\n");SendMsg(message,"Упр Рожкова\n");SendMsg(message,"Химия\n");break;}
+                                case 5:{SendMsg(message,"-----\n");SendMsg(message,"------\n");SendMsg(message,"Ин.яз\n");break;}
+                                case 6:{SendMsg(message,"Выходные");break;}
+                                case 7:{SendMsg(message,"Выходные");break;}
+                            }
+                            break;
+                        }
+                        case "Сменить пользователя":{Person.SetPerson(null);SendMsg(message,"Выберите нового пользователя");break;}
+                    }
+                    break;
+                }
+                case "Пупсик":
+                    {switch (update.getMessage().getText()) {
+                    case "Расписание на завтра": {
+                        switch (dayOfWeek) {
+                            case 1: {SendMsg(message, "ИНО упр. к.1 Биленко\n");SendMsg(message,"ТММ лаб. 1-421 Сорокина\n"+"\n"+"ТММ упр. 1-421 Сорокина\n");SendMsg(message,"Основы геометрич. Моделир-ния лаб. 3-203 Орехов\n");SendMsg(message,"Учебная практика лаб. I 7-115 Васильчук\n");break;}
+                            case 2: {SendMsg(message,"Глупышка у тебя выходной");break;}
+                            case 3:{SendMsg(message,"ТММ лекц. 1-422 Сорокина\n");SendMsg(message,"Эл/техника лекц. 7-502 Фишер\n");SendMsg(message,"Электрон. Устр-ва МХТ И РТС лекц. 7-502 Мельников\n"+"\n"+"ТФКП И ОПЕР. ИСЧИСЛ. лекц. 7-504 Андриянов\n");break;}
+                            case 4:{SendMsg(message,"-------\n"+"\n"+"Материаловедение лаб. II 4-320 Герасимова\n");SendMsg(message,"ТФКП и опер. Исчисл. Упр. 7-406 Андриянов\n");SendMsg(message,"Электрон. Устр-ва мхт и ртс лаб. 3-303 Петровичев\n");SendMsg(message,"Электротехника лаб. 3-212 Фишер\n"+"\n"+"Электротехника упр. 3-410 Фишер\n");break;}
+                            case 5:{SendMsg(message,"Основы робототех. И МХТ лекц. 7-502 Романов\n"+"------\n");SendMsg(message,"М/ведение лекц. 4-220 Герасимова\n"+"\n"+"-----");SendMsg(message,"М/ведение лекц. 4-220 Герасимова");SendMsg(message,"-------"+"\n"+"Основы геометрич. Моделир-ния 7-502 Орехов\n");break;}
+                            case 6:{SendMsg(message,"Основы робототех. и МХТ лаб. 7-115б Романов\n");SendMsg(message,"Физическая культура к.2\n");SendMsg(message,"------\n"+"\n"+"Русский язык и культура речи упр. 1-203 Логинова\n");break;}
+                            case 7:{SendMsg(message,"Глупышка у тебя выходной");break;}
+                        }
+                        break;
+                    }
+                    case "Расписание на сегодня": {
+                        switch (nextDayOfWeek) {
+                            case 1: {SendMsg(message, "ИНО упр. к.1 Биленко\n");SendMsg(message,"ТММ лаб. 1-421 Сорокина\n"+"\n"+"ТММ упр. 1-421 Сорокина\n");SendMsg(message,"Основы геометрич. Моделир-ния лаб. 3-203 Орехов\n");SendMsg(message,"Учебная практика лаб. I 7-115 Васильчук\n");break;}
+                            case 2: {SendMsg(message,"Глупышка у тебя выходной");break;}
+                            case 3:{SendMsg(message,"ТММ лекц. 1-422 Сорокина\n");SendMsg(message,"Эл/техника лекц. 7-502 Фишер\n");SendMsg(message,"Электрон. Устр-ва МХТ И РТС лекц. 7-502 Мельников\n"+"\n"+"ТФКП И ОПЕР. ИСЧИСЛ. лекц. 7-504 Андриянов\n");break;}
+                            case 4:{SendMsg(message,"-------\n"+"\n"+"Материаловедение лаб. II 4-320 Герасимова\n");SendMsg(message,"ТФКП и опер. Исчисл. Упр. 7-406 Андриянов\n");SendMsg(message,"Электрон. Устр-ва мхт и ртс лаб. 3-303 Петровичев\n");SendMsg(message,"Электротехника лаб. 3-212 Фишер\n"+"\n"+"Электротехника упр. 3-410 Фишер\n");break;}
+                            case 5:{SendMsg(message,"Основы робототех. И МХТ лекц. 7-502 Романов\n"+"------\n");SendMsg(message,"М/ведение лекц. 4-220 Герасимова\n"+"\n"+"-----");SendMsg(message,"М/ведение лекц. 4-220 Герасимова");SendMsg(message,"-------"+"\n"+"Основы геометрич. Моделир-ния 7-502 Орехов\n");break;}
+                            case 6:{SendMsg(message,"Основы робототех. и МХТ лаб. 7-115б Романов\n");SendMsg(message,"Физическая культура к.2\n");SendMsg(message,"------\n"+"\n"+"Русский язык и культура речи упр. 1-203 Логинова\n");break;}
+                            case 7:{SendMsg(message,"Глупышка у тебя выходной");break;}
+                        }
+                        break;
+                    }
+                        case "Сменить пользователя":{Person.SetPerson(null);SendMsg(message,"Выберите нового пользователя");break;}
+                    }
+                    break;
+                }
+                case "Папочка":{
+                    switch (update.getMessage().getText()) {
+                        case "Расписание на завтра": {
+                            switch (dayOfWeek) {
+                                case 1: {SendMsg(message, "ФИЗ.-ХИМ. ОСНОВЫ М И НТ лаб. 3-213 Парамонов\n"+"\n"+"ТВ И МС упр. 7-404 Савотин");SendMsg(message,"ТВ И МС 7-404 Савотин\n");SendMsg(message,"ФИЗИЧЕСКАЯ КУЛЬТУРА к.2\n");SendMsg(message,"-----\n"+"\n"+"ФИЗ.-ХИМ. ОСНОВЫ М И НТ упр. 3-416 Ткаченко\n");break;}
+                                case 2: {SendMsg(message,"ФИЗ.-ХИМ. ОСНОВЫ МИКРО- И Н/ТЕХНОЛОГИЙ лекц. 3-403 Андреев\n");SendMsg(message,"МАТЕМ. МОДЕЛИР. ТЕХ. ОБЪЕКТОВ лекц. 3-426 Шагаев\n");SendMsg(message,"МЕТРОЛ. И ТИ В ПРОИЗВ. ЭС лекц. 3-403 Адарчин\n"+"\n"+"ОКП лекц. 3-403 Адарчин");break;}
+                                case 3:{SendMsg(message,"------\n");SendMsg(message,"ФИЗ. ОСНОВЫ МИКРОЭЛЕКТРОНИКИ лекц. 3-403 Столяров\n");SendMsg(message,"ФИЗИЧЕСКАЯ КУЛЬТУРА к.2\n");SendMsg(message,"СПЕЦГЛАВЫ ЭЛ/ТЕХНИКИ 4-204 Царькова\n");break;}
+                                case 4:{SendMsg(message,"Учебная Военная Ебля");break;}
+                                case 5:{SendMsg(message,"ИНО упр. 6-405 Журавлева, Тунанова\n");SendMsg(message,"ОКП упр. 3-416 Адарчин\n"+"\n"+"ФИЗ. ОСНОВЫ МИКРОЭЛ. лаб. 3-413 Шагаев");SendMsg(message,"ФИЗ. ОСНОВЫ МИКРОЭЛ. упр. 3-404 Шагаев\n"+"\n"+"---");break;}
+                                case 6:{SendMsg(message,"МАТЕМ. МОДЕЛИР. ТЕХ. ОБЪЕКТОВ упр. 3-413 Шагаев\n");SendMsg(message,"СПЕЦГЛАВЫ ЭЛ/ТЕХНИКИ упр. 4-312 Царькова\n"+"\n"+"МЕТРОЛ. И ТИ В ПРОИЗВ. ЭС упр. 3-426 Лыков");SendMsg(message,"МЕТРОЛ. И ТИ В ПРОИЗВ. ЭС лаб. 3-416 Лыков\n" + "\n"+"---");break;}
+                                case 7:{SendMsg(message,"Выходняра");break;}
+                            }
+                            break;
+                        }
+                        case "Расписание на сегодня": {
+                            switch (nextDayOfWeek) {
+                                case 1: {SendMsg(message, "ФИЗ.-ХИМ. ОСНОВЫ М И НТ лаб. 3-213 Парамонов\n"+"\n"+"ТВ И МС упр. 7-404 Савотин");SendMsg(message,"ТВ И МС 7-404 Савотин\n");SendMsg(message,"ФИЗИЧЕСКАЯ КУЛЬТУРА к.2\n");SendMsg(message,"-----\n"+"\n"+"ФИЗ.-ХИМ. ОСНОВЫ М И НТ упр. 3-416 Ткаченко\n");break;}
+                                case 2: {SendMsg(message,"ФИЗ.-ХИМ. ОСНОВЫ МИКРО- И Н/ТЕХНОЛОГИЙ лекц. 3-403 Андреев\n");SendMsg(message,"МАТЕМ. МОДЕЛИР. ТЕХ. ОБЪЕКТОВ лекц. 3-426 Шагаев\n");SendMsg(message,"МЕТРОЛ. И ТИ В ПРОИЗВ. ЭС лекц. 3-403 Адарчин\n"+"\n"+"ОКП лекц. 3-403 Адарчин");break;}
+                                case 3:{SendMsg(message,"------\n");SendMsg(message,"ФИЗ. ОСНОВЫ МИКРОЭЛЕКТРОНИКИ лекц. 3-403 Столяров\n");SendMsg(message,"ФИЗИЧЕСКАЯ КУЛЬТУРА к.2\n");SendMsg(message,"СПЕЦГЛАВЫ ЭЛ/ТЕХНИКИ 4-204 Царькова\n");break;}
+                                case 4:{SendMsg(message,"Учебная Военная Ебля");break;}
+                                case 5:{SendMsg(message,"ИНО упр. 6-405 Журавлева, Тунанова\n");SendMsg(message,"ОКП упр. 3-416 Адарчин\n"+"\n"+"ФИЗ. ОСНОВЫ МИКРОЭЛ. лаб. 3-413 Шагаев");SendMsg(message,"ФИЗ. ОСНОВЫ МИКРОЭЛ. упр. 3-404 Шагаев\n"+"\n"+"---");break;}
+                                case 6:{SendMsg(message,"МАТЕМ. МОДЕЛИР. ТЕХ. ОБЪЕКТОВ упр. 3-413 Шагаев\n");SendMsg(message,"СПЕЦГЛАВЫ ЭЛ/ТЕХНИКИ упр. 4-312 Царькова\n"+"\n"+"МЕТРОЛ. И ТИ В ПРОИЗВ. ЭС упр. 3-426 Лыков");SendMsg(message,"МЕТРОЛ. И ТИ В ПРОИЗВ. ЭС лаб. 3-416 Лыков\n" + "\n"+"---");break;}
+                                case 7:{SendMsg(message,"Выходняра");break;}
+                            }
+                            break;
+                        }
+                        case "Сменить пользователя":{Person.SetPerson(null);SendMsg(message,"Выберите нового пользователя");break;}
+                    }
+
+                    break;
+
+                }
+                }
+
+            }
+
+        }
+
+
 
     public void SendMsg(Message message, String text) {
         SendMessage sendMessage = new SendMessage();
@@ -78,103 +167,45 @@ public class Bot extends TelegramLongPollingBot {
         sendMessage.setReplyToMessageId(message.getMessageId());
         sendMessage.setText(text);
         try {
-
-            /* SetButtons(sendMessage);*/
+            SetButtons(sendMessage, Person);
             sendMessage(sendMessage);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }
 
-    /*public BotApiMethod processCallbackQuery(CallbackQuery buttonQuery){
-            final long chatId=buttonQuery.getMessage().getChatId();
-            final int iserId=buttonQuery.getFrom().getId();
-            BotApiMethod<?> callBackAnswer=mainMenuService.getMainMessage(chatId,"Воспользуйтесь главным меню");
-            if(buttonQuery.getData().equals("Расписание на завтра")){
-                callBackAnswer =new SendMessage(chatId,"");
-            }
-    }*/
-   /* private InlineKeyboardMarkup getInLineMessageButtons() {
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
 
-        InlineKeyboardButton ButtonLessonsToday = new InlineKeyboardButton().setText("Расписание на сегодня");
-        InlineKeyboardButton ButtonLessonsTomorrow = new InlineKeyboardButton().setText("Расписание на завтра");
-        InlineKeyboardButton ButtonForPersonDad = new InlineKeyboardButton().setText("Папочка");
-        InlineKeyboardButton ButtonForPersonPups = new InlineKeyboardButton().setText("Пупсик");
-        InlineKeyboardButton ButtonForPersonDen = new InlineKeyboardButton().setText("Дэн");
-        InlineKeyboardButton ButtonForChat = new InlineKeyboardButton().setText("Поболтаем?");
-        InlineKeyboardButton ButtonForLessonsForYourDay = new InlineKeyboardButton().setText("Расписание на любой день");
-        InlineKeyboardButton ButtonForLost = new InlineKeyboardButton().setText("Прогулы");
-
-        ButtonLessonsToday.setCallbackData("Расписание на завтра");
-        ButtonLessonsTomorrow.setCallbackData("Расписание на завтра");
-        ButtonForPersonDad.setCallbackData("Папочка");
-        ButtonForPersonPups.setCallbackData("Пупсик");
-        ButtonForPersonDen.setCallbackData("Дэн");
-        ButtonForChat.setCallbackData("Поболтаем?");
-        ButtonForLessonsForYourDay.setCallbackData("Расписание на любой день");
-        ButtonForLost.setCallbackData("Прогулы");
-
-        List<InlineKeyboardButton> keyboardButtonsRow = new ArrayList<>();
-        keyboardButtonsRow.add(ButtonLessonsToday);
-        keyboardButtonsRow.add(ButtonLessonsTomorrow);
-
-        List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
-        keyboardButtonsRow1.add(ButtonForLessonsForYourDay);
-
-        List<InlineKeyboardButton>keyboardButtonsRow2=new ArrayList<>();
-        keyboardButtonsRow2.add(ButtonForChat);
-
-        List<InlineKeyboardButton>keyboardButtonsRow3=new ArrayList<>();
-        keyboardButtonsRow3.add(ButtonForLost);
-
-        List<InlineKeyboardButton>keyboardButtonsRow4=new ArrayList<>();
-        keyboardButtonsRow4.add(ButtonForPersonDad);
-        keyboardButtonsRow4.add(ButtonForPersonPups);
-        keyboardButtonsRow4.add(ButtonForPersonDen);
-
-        List<List<InlineKeyboardButton>>rowlist=new ArrayList<>();
-        rowlist.add(keyboardButtonsRow);
-        rowlist.add(keyboardButtonsRow1);
-        rowlist.add(keyboardButtonsRow2);
-        rowlist.add(keyboardButtonsRow2);
-        rowlist.add(keyboardButtonsRow3);
-        rowlist.add(keyboardButtonsRow4);
-
-        inlineKeyboardMarkup.setKeyboard(rowlist);
-        return inlineKeyboardMarkup;
-
-    }*/
-
-
-   public void SetButtons(SendMessage sendMessage) {
+    public void SetButtons(SendMessage sendMessage, Person Person) {
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         sendMessage.setReplyMarkup(replyKeyboardMarkup);
         replyKeyboardMarkup.setSelective(true);
         replyKeyboardMarkup.setResizeKeyboard(true);
-
         replyKeyboardMarkup.setOneTimeKeyboard(false);
+
         List<KeyboardRow> keyboardRowList = new ArrayList<>();
+        if (Person.GetPesrson() != null) {
+            KeyboardRow keyboardFirstRow = new KeyboardRow();
+            keyboardFirstRow.add(new KeyboardButton("Расписание на завтра"));
+            keyboardFirstRow.add(new KeyboardButton("Расписание на сегодня"));
 
-        KeyboardRow keyboardFirstRow = new KeyboardRow();
-        keyboardFirstRow.add(new KeyboardButton("Расписание на завтра"));
-        keyboardFirstRow.add(new KeyboardButton("Расписание на сегодня"));
+            KeyboardRow keyboardSecondRow = new KeyboardRow();
+            keyboardSecondRow.add(new KeyboardButton("Сменить пользователя"));
+        //    keyboardSecondRow.add(new KeyboardButton("Рассписание на любой день"));
 
-        KeyboardRow keyboardSecondRow = new KeyboardRow();
-        keyboardSecondRow.add(new KeyboardButton("Количество прогулов"));
-        keyboardSecondRow.add(new KeyboardButton("Рассписание на любой день"));
+           // KeyboardRow keyboardThirdRow = new KeyboardRow();
+     //       keyboardThirdRow.add(new KeyboardButton("Поболтаем ?"));
+            keyboardRowList.add(keyboardFirstRow);
+            keyboardRowList.add(keyboardSecondRow);
+         //   keyboardRowList.add(keyboardThirdRow);
+        }
+else {
+            KeyboardRow keyboardFourRow = new KeyboardRow();
+            keyboardFourRow.add(new KeyboardButton("Пупсик"));
+            keyboardFourRow.add(new KeyboardButton("Папочка"));
+            keyboardFourRow.add(new KeyboardButton("Дэн"));
+            keyboardRowList.add(keyboardFourRow);
+        }
 
-        KeyboardRow keyboardThirdRow = new KeyboardRow();
-        keyboardThirdRow.add(new KeyboardButton("Поболтаем ?"));
-
-        KeyboardRow keyboardFourRow = new KeyboardRow();
-        keyboardFourRow.add(new KeyboardButton("Пупсик"));
-        keyboardFourRow.add(new KeyboardButton("Папочка"));
-
-        keyboardRowList.add(keyboardFirstRow);
-        keyboardRowList.add(keyboardSecondRow);
-        keyboardRowList.add(keyboardThirdRow);
-        keyboardRowList.add(keyboardFourRow);
         replyKeyboardMarkup.setKeyboard(keyboardRowList);
 
     }
@@ -190,3 +221,4 @@ public class Bot extends TelegramLongPollingBot {
         return "1609845253:AAEWJ48yaAwF5n8PLrSXt0BipuTypeyG6PQ";
     }
 }
+
