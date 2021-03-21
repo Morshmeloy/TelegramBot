@@ -1,10 +1,14 @@
 import javassist.CodeConverter;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
+import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.CallbackQuery;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -38,11 +42,32 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
-        if (message != null && message.hasText()) {
-            switch (message.getText()) {
-                
+        if (update.getMessage() != null && update.getMessage().hasText()) {
+            switch (update.getMessage().getText()) {
+                case "Расписание на завтра": {
+                    SendMsg(message, "Кому требуеться рассписание");
+                    switch (update.getMessage().getText()) {
+                        case "Пупсик": {
+                            switch (dayOfWeek) {
+                                case 7: {
+                                    SendMsg(message, "2");
+                                    break;
+                                }
+                                default:
+                                    SendMsg(message, "3");
+                            }
+                            break;
+                        }
+                    }
 
+                    break;
+                }
+                case "Расписание на сегодня": {
+                    SendMsg(message, "4");
+                    break;
+                }
             }
+
         }
     }
 
@@ -53,14 +78,76 @@ public class Bot extends TelegramLongPollingBot {
         sendMessage.setReplyToMessageId(message.getMessageId());
         sendMessage.setText(text);
         try {
-            SetButtons(sendMessage);
+
+            /* SetButtons(sendMessage);*/
             sendMessage(sendMessage);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }
 
-    public void SetButtons(SendMessage sendMessage) {
+    /*public BotApiMethod processCallbackQuery(CallbackQuery buttonQuery){
+            final long chatId=buttonQuery.getMessage().getChatId();
+            final int iserId=buttonQuery.getFrom().getId();
+            BotApiMethod<?> callBackAnswer=mainMenuService.getMainMessage(chatId,"Воспользуйтесь главным меню");
+            if(buttonQuery.getData().equals("Расписание на завтра")){
+                callBackAnswer =new SendMessage(chatId,"");
+            }
+    }*/
+   /* private InlineKeyboardMarkup getInLineMessageButtons() {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+
+        InlineKeyboardButton ButtonLessonsToday = new InlineKeyboardButton().setText("Расписание на сегодня");
+        InlineKeyboardButton ButtonLessonsTomorrow = new InlineKeyboardButton().setText("Расписание на завтра");
+        InlineKeyboardButton ButtonForPersonDad = new InlineKeyboardButton().setText("Папочка");
+        InlineKeyboardButton ButtonForPersonPups = new InlineKeyboardButton().setText("Пупсик");
+        InlineKeyboardButton ButtonForPersonDen = new InlineKeyboardButton().setText("Дэн");
+        InlineKeyboardButton ButtonForChat = new InlineKeyboardButton().setText("Поболтаем?");
+        InlineKeyboardButton ButtonForLessonsForYourDay = new InlineKeyboardButton().setText("Расписание на любой день");
+        InlineKeyboardButton ButtonForLost = new InlineKeyboardButton().setText("Прогулы");
+
+        ButtonLessonsToday.setCallbackData("Расписание на завтра");
+        ButtonLessonsTomorrow.setCallbackData("Расписание на завтра");
+        ButtonForPersonDad.setCallbackData("Папочка");
+        ButtonForPersonPups.setCallbackData("Пупсик");
+        ButtonForPersonDen.setCallbackData("Дэн");
+        ButtonForChat.setCallbackData("Поболтаем?");
+        ButtonForLessonsForYourDay.setCallbackData("Расписание на любой день");
+        ButtonForLost.setCallbackData("Прогулы");
+
+        List<InlineKeyboardButton> keyboardButtonsRow = new ArrayList<>();
+        keyboardButtonsRow.add(ButtonLessonsToday);
+        keyboardButtonsRow.add(ButtonLessonsTomorrow);
+
+        List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
+        keyboardButtonsRow1.add(ButtonForLessonsForYourDay);
+
+        List<InlineKeyboardButton>keyboardButtonsRow2=new ArrayList<>();
+        keyboardButtonsRow2.add(ButtonForChat);
+
+        List<InlineKeyboardButton>keyboardButtonsRow3=new ArrayList<>();
+        keyboardButtonsRow3.add(ButtonForLost);
+
+        List<InlineKeyboardButton>keyboardButtonsRow4=new ArrayList<>();
+        keyboardButtonsRow4.add(ButtonForPersonDad);
+        keyboardButtonsRow4.add(ButtonForPersonPups);
+        keyboardButtonsRow4.add(ButtonForPersonDen);
+
+        List<List<InlineKeyboardButton>>rowlist=new ArrayList<>();
+        rowlist.add(keyboardButtonsRow);
+        rowlist.add(keyboardButtonsRow1);
+        rowlist.add(keyboardButtonsRow2);
+        rowlist.add(keyboardButtonsRow2);
+        rowlist.add(keyboardButtonsRow3);
+        rowlist.add(keyboardButtonsRow4);
+
+        inlineKeyboardMarkup.setKeyboard(rowlist);
+        return inlineKeyboardMarkup;
+
+    }*/
+
+
+   public void SetButtons(SendMessage sendMessage) {
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         sendMessage.setReplyMarkup(replyKeyboardMarkup);
         replyKeyboardMarkup.setSelective(true);
@@ -70,18 +157,18 @@ public class Bot extends TelegramLongPollingBot {
         List<KeyboardRow> keyboardRowList = new ArrayList<>();
 
         KeyboardRow keyboardFirstRow = new KeyboardRow();
+        keyboardFirstRow.add(new KeyboardButton("Расписание на завтра"));
+        keyboardFirstRow.add(new KeyboardButton("Расписание на сегодня"));
 
-        keyboardFirstRow.add(new KeyboardButton("Рассписание на завтра"));
-        keyboardFirstRow.add(new KeyboardButton("Рассписание на сегодня"));
         KeyboardRow keyboardSecondRow = new KeyboardRow();
         keyboardSecondRow.add(new KeyboardButton("Количество прогулов"));
         keyboardSecondRow.add(new KeyboardButton("Рассписание на любой день"));
+
         KeyboardRow keyboardThirdRow = new KeyboardRow();
         keyboardThirdRow.add(new KeyboardButton("Поболтаем ?"));
 
         KeyboardRow keyboardFourRow = new KeyboardRow();
-        keyboardFourRow.add((new KeyboardButton("Пупсик")));
-        keyboardFourRow.add(new KeyboardButton("Денчик-зачётный"));
+        keyboardFourRow.add(new KeyboardButton("Пупсик"));
         keyboardFourRow.add(new KeyboardButton("Папочка"));
 
         keyboardRowList.add(keyboardFirstRow);
@@ -91,6 +178,7 @@ public class Bot extends TelegramLongPollingBot {
         replyKeyboardMarkup.setKeyboard(keyboardRowList);
 
     }
+
 
     @Override
     public String getBotUsername() {
